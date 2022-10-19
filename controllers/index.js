@@ -1,9 +1,14 @@
-const listContacts = require("./listContacts");
-const getContactById = require("./getContactById");
-const removeContact = require("./removeContact");
-const addContact = require("./addContact");
-const updateContact = require("./updateContact");
-const updateStatusContact = require("./updateStatusContact");
+const listContacts = require("./contacts/listContacts");
+const getContactById = require("./contacts/getContactById");
+const removeContact = require("./contacts/removeContact");
+const addContact = require("./contacts/addContact");
+const updateContact = require("./contacts/updateContact");
+const updateStatusContact = require("./contacts/updateStatusContact");
+
+const register = require("./auth/register");
+const login = require("./auth/login");
+const getCurrent = require("./auth/getCurrent");
+const logout = require("./auth/logout");
 
 module.exports = {
   listContacts,
@@ -12,4 +17,8 @@ module.exports = {
   addContact,
   updateContact,
   updateStatusContact,
+  register,
+  login,
+  getCurrent,
+  logout,
 };
