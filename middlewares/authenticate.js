@@ -25,6 +25,7 @@ const authenticate = async (req, res, next) => {
       error.status = 401;
       error.message = "Not authorized";
     }
+    console.log(error);
     next(error);
   }
 };
