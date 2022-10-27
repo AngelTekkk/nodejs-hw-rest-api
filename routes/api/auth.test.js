@@ -1,11 +1,17 @@
 const mongoose = require("mongoose");
 const request = require("supertest");
+const bcrypt = require("bcryptjs");
+const gravatar = require("gravatar");
 require("dotenv").config();
 
 const app = require("../../app");
-const { User } = require("../../models/user");
+const { User } = require("../../models");
 
-const { DB_TEST_HOST, PORT } = process.env;
+const { DB_HOST, PORT } = process.env;
+const login = DB_HOST.split(".net/");
+const db = login[1].split("?");
+db[0] = "test";
+const DB_TEST_HOST = login[0] + ".net/" + db.join("?");
 
 describe("test auth routes", () => {
   let server;
@@ -17,23 +23,31 @@ describe("test auth routes", () => {
   });
 
   afterEach((done) => {
-    mongoose.connection.test.dropCollection(() => {
-      mongoose.connection.close(() => done());
-    });
+    mongoose.connection.dropDatabase(
+      "test",
+      mongoose.connection.close(() => done())
+    );
   });
 
   test("test login route", async () => {
+    const name = "testUser";
+    const email = "testUser@gmail.com";
+
+    const hashPassword = await bcrypt.hash(name, 10);
+    const avatarURL = gravatar.url(email);
+
     const newUser = {
-      name: "testUser",
-      email: "testUser@gmail.com",
-      password: "testUser",
+      name: name,
+      email: email,
+      password: hashPassword,
+      avatarURL,
     };
 
-    const user = await request(app).post("/api/users/signup").send(newUser);
+    const user = await User.create(newUser);
 
     const loginUser = {
       email: "testUser@gmail.com",
-      password: "testUser",
+      password: name,
     };
 
     const response = await request(app)
@@ -41,10 +55,8 @@ describe("test auth routes", () => {
       .send(loginUser);
     expect(response.statusCode).toBe(200);
     const { body } = response;
-    console.log(body.token);
     expect(body.token).toBeTruthy();
-    const a = await User.findById(user._id);
-    console.log(a);
+    const { token } = await User.findById(user._id);
     expect(body.token).toBe(token);
   });
 });
