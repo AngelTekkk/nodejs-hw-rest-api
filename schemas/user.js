@@ -23,7 +23,16 @@ const loginSchema = Joi.object({
   password: Joi.string().min(6).required(),
 });
 
+const resendEmailSchema = Joi.object({
+  email: Joi.string()
+    .email({
+      minDomainSegments: 2,
+    })
+    .required(),
+});
+
 module.exports = {
   registerSchema,
   loginSchema,
+  resendEmailSchema,
 };
